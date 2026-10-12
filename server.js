@@ -17,6 +17,16 @@ app.get("/admin", (req, res) => {
 });
 
 
+/*
+ * PRIVATE CUSTOMER SHIPMENT ROOM
+ * package-room.html must sit beside server.js/index.html.
+ */
+app.get("/package-room.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "package-room.html"));
+});
+
+
+
 /* =========================================
    DATABASE
 ========================================= */
@@ -117,6 +127,84 @@ async function setupDatabase() {
 
   }
 
+
+
+  /* =========================================
+     PURCHASED ITEMS / PACKAGE MALL
+     Linked directly to the shipment tracking code.
+  ========================================= */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS package_mall_items (
+      id BIGSERIAL PRIMARY KEY,
+      tracking_code TEXT NOT NULL
+        REFERENCES shipments(code)
+        ON DELETE CASCADE,
+      product_name TEXT DEFAULT '',
+      image_url TEXT DEFAULT '',
+      price NUMERIC(14,2) DEFAULT 0,
+      currency TEXT DEFAULT 'USD',
+      quantity INTEGER DEFAULT 1,
+      seller TEXT DEFAULT '',
+      purchase_status TEXT DEFAULT 'Purchased',
+      purchase_date TEXT DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  // Repair older databases where package_mall_items timestamps were
+  // created as TEXT. The current schema requires real timestamps.
+  const mallCols = await pool.query(`
+    SELECT column_name, data_type
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'package_mall_items'
+      AND column_name IN ('created_at','updated_at')
+  `);
+  const mallTypes = Object.fromEntries(mallCols.rows.map(r => [r.column_name, r.data_type]));
+
+  if (mallTypes.created_at === 'text') {
+    await pool.query(`
+      ALTER TABLE package_mall_items
+      ALTER COLUMN created_at TYPE TIMESTAMPTZ
+      USING CASE
+        WHEN created_at IS NULL OR btrim(created_at) = '' THEN NULL
+        ELSE created_at::timestamptz
+      END
+    `);
+  }
+
+  if (mallTypes.updated_at === 'text') {
+    await pool.query(`
+      ALTER TABLE package_mall_items
+      ALTER COLUMN updated_at TYPE TIMESTAMPTZ
+      USING CASE
+        WHEN updated_at IS NULL OR btrim(updated_at) = '' THEN NULL
+        ELSE updated_at::timestamptz
+      END
+    `);
+  }
+
+  await pool.query(`
+    UPDATE package_mall_items
+    SET created_at = COALESCE(created_at, NOW()),
+        updated_at = COALESCE(updated_at, NOW())
+    WHERE created_at IS NULL OR updated_at IS NULL
+  `);
+
+  await pool.query(`
+    ALTER TABLE package_mall_items
+    ALTER COLUMN created_at SET DEFAULT NOW(),
+    ALTER COLUMN updated_at SET DEFAULT NOW(),
+    ALTER COLUMN created_at SET NOT NULL,
+    ALTER COLUMN updated_at SET NOT NULL
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_package_mall_tracking_code
+    ON package_mall_items(tracking_code)
+  `);
 
   console.log("Database ready.");
 }
@@ -597,7 +685,367 @@ app.get(
 
 
 /* =========================================
-   ADMIN — LIST SHIPMENTS
+   CUSTOMER â€” PURCHASED ITEMS
+========================================= */
+
+app.get(
+  "/api/shipments/:code/mall",
+  async (req, res) => {
+    try {
+      const code =
+        req.params.code
+          .trim()
+          .toUpperCase();
+
+      const shipment =
+        await pool.query(
+          `
+          SELECT code
+          FROM shipments
+          WHERE code = $1
+          `,
+          [code]
+        );
+
+      if (shipment.rows.length === 0) {
+        return res.sendStatus(404);
+      }
+
+      const result =
+        await pool.query(
+          `
+          SELECT
+            id,
+            tracking_code,
+            product_name,
+            image_url,
+            price,
+            currency,
+            quantity,
+            seller,
+            purchase_status,
+            purchase_date,
+            created_at,
+            updated_at
+          FROM package_mall_items
+          WHERE tracking_code = $1
+          ORDER BY created_at ASC, id ASC
+          `,
+          [code]
+        );
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Customer mall error:", error);
+      res.status(500).json({
+        error: "Server error"
+      });
+    }
+  }
+);
+
+
+/* =========================================
+   ADMIN â€” LIST PURCHASED ITEMS
+========================================= */
+
+app.get(
+  "/api/admin/shipments/:code/mall",
+  auth,
+  async (req, res) => {
+    try {
+      const code =
+        req.params.code
+          .trim()
+          .toUpperCase();
+
+      const result =
+        await pool.query(
+          `
+          SELECT *
+          FROM package_mall_items
+          WHERE tracking_code = $1
+          ORDER BY created_at ASC, id ASC
+          `,
+          [code]
+        );
+
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Admin mall list error:", error);
+      res.status(500).json({
+        error: "Server error"
+      });
+    }
+  }
+);
+
+
+/* =========================================
+   ADMIN â€” ADD PURCHASED ITEM
+========================================= */
+
+app.post(
+  "/api/admin/shipments/:code/mall",
+  auth,
+  async (req, res) => {
+    try {
+      const code =
+        req.params.code
+          .trim()
+          .toUpperCase();
+
+      const shipment =
+        await pool.query(
+          `
+          SELECT code
+          FROM shipments
+          WHERE code = $1
+          `,
+          [code]
+        );
+
+      if (shipment.rows.length === 0) {
+        return res.status(404).json({
+          error: "Shipment not found"
+        });
+      }
+
+      const data = req.body || {};
+
+      const productName =
+        String(data.product_name || "").trim();
+
+      const imageUrl =
+        String(data.image_url || "").trim();
+
+      const seller =
+        String(data.seller || "").trim();
+
+      const currency = "USD";
+
+      const quantity =
+        Math.max(
+          1,
+          parseInt(data.quantity, 10) || 1
+        );
+
+      const priceNumber =
+        Number(data.price);
+
+      const price =
+        Number.isFinite(priceNumber) && priceNumber >= 0
+          ? priceNumber
+          : 0;
+
+      const purchaseDate =
+        String(data.purchase_date || "").trim();
+
+      const purchaseStatus =
+        String(
+          data.purchase_status ||
+          "Purchased"
+        ).trim();
+
+      if (!productName) {
+        return res.status(400).json({
+          error: "Product name required"
+        });
+      }
+
+      const result =
+        await pool.query(
+          `
+          INSERT INTO package_mall_items
+          (
+            tracking_code,
+            product_name,
+            image_url,
+            price,
+            currency,
+            quantity,
+            seller,
+            purchase_status,
+            purchase_date,
+            created_at,
+            updated_at
+          )
+          VALUES
+          (
+            $1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW()
+          )
+          RETURNING *
+          `,
+          [
+            code,
+            productName,
+            imageUrl,
+            price,
+            currency,
+            quantity,
+            seller,
+            purchaseStatus,
+            purchaseDate
+          ]
+        );
+
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error("Add mall item error:", error);
+      res.status(500).json({
+        error: "Could not save purchased item"
+      });
+    }
+  }
+);
+
+
+/* =========================================
+   ADMIN â€” EDIT PURCHASED ITEM
+========================================= */
+
+app.put(
+  "/api/admin/mall/:id",
+  auth,
+  async (req, res) => {
+    try {
+      const id =
+        Number.parseInt(req.params.id, 10);
+
+      if (!Number.isInteger(id)) {
+        return res.status(400).json({
+          error: "Invalid item id"
+        });
+      }
+
+      const data = req.body || {};
+
+      const productName =
+        String(data.product_name || "").trim();
+
+      const imageUrl =
+        String(data.image_url || "").trim();
+
+      const seller =
+        String(data.seller || "").trim();
+
+      const quantity =
+        Math.max(
+          1,
+          parseInt(data.quantity, 10) || 1
+        );
+
+      const priceNumber =
+        Number(data.price);
+
+      const price =
+        Number.isFinite(priceNumber) && priceNumber >= 0
+          ? priceNumber
+          : 0;
+
+      const purchaseDate =
+        String(data.purchase_date || "").trim();
+
+      const purchaseStatus =
+        String(
+          data.purchase_status ||
+          "Purchased"
+        ).trim();
+
+      if (!productName) {
+        return res.status(400).json({
+          error: "Product name required"
+        });
+      }
+
+      const result =
+        await pool.query(
+          `
+          UPDATE package_mall_items
+          SET
+            product_name = $1,
+            image_url = $2,
+            price = $3,
+            currency = 'USD',
+            quantity = $4,
+            seller = $5,
+            purchase_status = $6,
+            purchase_date = $7,
+            updated_at = NOW()
+          WHERE id = $8
+          RETURNING *
+          `,
+          [
+            productName,
+            imageUrl,
+            price,
+            quantity,
+            seller,
+            purchaseStatus,
+            purchaseDate,
+            id
+          ]
+        );
+
+      if (result.rows.length === 0) {
+        return res.sendStatus(404);
+      }
+
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Edit mall item error:", error);
+      res.status(500).json({
+        error: "Could not update purchased item"
+      });
+    }
+  }
+);
+
+
+/* =========================================
+   ADMIN â€” DELETE PURCHASED ITEM
+========================================= */
+
+app.delete(
+  "/api/admin/mall/:id",
+  auth,
+  async (req, res) => {
+    try {
+      const id =
+        Number.parseInt(req.params.id, 10);
+
+      if (!Number.isInteger(id)) {
+        return res.status(400).json({
+          error: "Invalid item id"
+        });
+      }
+
+      const result =
+        await pool.query(
+          `
+          DELETE FROM package_mall_items
+          WHERE id = $1
+          `,
+          [id]
+        );
+
+      if (result.rowCount === 0) {
+        return res.sendStatus(404);
+      }
+
+      res.sendStatus(204);
+    } catch (error) {
+      console.error("Delete mall item error:", error);
+      res.status(500).json({
+        error: "Could not delete purchased item"
+      });
+    }
+  }
+);
+
+
+/* =========================================
+   ADMIN â€” LIST SHIPMENTS
 ========================================= */
 
 app.get(
@@ -637,7 +1085,7 @@ app.get(
 
 
 /* =========================================
-   ADMIN — CREATE / UPDATE SHIPMENT
+   ADMIN â€” CREATE / UPDATE SHIPMENT
 ========================================= */
 
 app.post(
@@ -945,7 +1393,7 @@ app.post(
 
 
 /* =========================================
-   ADMIN — DELETE SHIPMENT
+   ADMIN â€” DELETE SHIPMENT
 ========================================= */
 
 app.delete(
