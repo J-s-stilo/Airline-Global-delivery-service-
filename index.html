@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>JESTILO Worldwide Delivery | Shipment Tracking</title>
+<title>AIRLINE GLOBAL DELIVERY SERVICE | Shipment Tracking</title>
 
 <meta name="description"
-content="JESTILO Worldwide Delivery shipment information and tracking.">
+content="AIRLINE GLOBAL DELIVERY SERVICE shipment information and tracking.">
 
 <!-- Leaflet map -->
 <link
@@ -1297,6 +1297,48 @@ footer a{
 /* Private shipment room is now the customer tracking destination. */
 #resultSection{display:none !important;}
 </style>
+
+<style id="airline-yellow-red-design">
+:root{
+  --air-yellow:#ffcc00;
+  --air-yellow-soft:#fff4bf;
+  --air-red:#d40511;
+  --air-red-dark:#a9000a;
+  --air-black:#151515;
+}
+header{background:var(--air-yellow);color:#151515;border-bottom:4px solid var(--air-red)}
+.logo{color:#151515}
+.logo span{color:var(--air-red)}
+.nav-links a{color:#151515}
+.nav-button,.primary,.track-form button,.tawk-support-button{background:var(--air-red)!important;color:#fff!important}
+.hero{
+  background:linear-gradient(120deg,rgba(20,20,20,.98),rgba(100,0,5,.96)),#151515;
+  border-bottom:7px solid var(--air-yellow);
+}
+.eyebrow,.section-label{color:var(--air-red)}
+.hero h1 span{color:var(--air-yellow)}
+.route-arrow,.result-arrow,.map-route-arrow{color:var(--air-red)}
+.track-card{border-top:6px solid var(--air-red)}
+.track-form input:focus{border-color:var(--air-red)}
+.service{border-top:4px solid var(--air-yellow)}
+.service-icon{background:var(--air-yellow-soft)}
+.number{background:var(--air-red)}
+.dot.active{background:var(--air-red);box-shadow:0 0 0 5px var(--air-yellow-soft)}
+.gallery-card{border-radius:8px;border-top:5px solid var(--air-red)}
+.jestilo-gallery{background:#fff}
+.delivery-info-icon{background:var(--air-red)}
+.delivery-info-box{
+  background:linear-gradient(135deg,#151515,#4b0006);
+}
+.delivery-info-box-second{
+  background:linear-gradient(135deg,#111,#650008);
+}
+.progress-stage.active span{background:var(--air-red);box-shadow:0 0 0 5px rgba(255,204,0,.25)}
+footer{border-top:6px solid var(--air-yellow)}
+.testimonial-stars,.testimonial-dot.active{color:var(--air-red);background:var(--air-red)}
+.secondary{border-color:rgba(255,255,255,.45)}
+</style>
+
 </head>
 
 <body>
@@ -1305,7 +1347,7 @@ footer a{
   <div class="container nav">
 
     <div class="logo">
-      JESTILO <span>WORLDWIDE DELIVERY</span>
+      AIRLINE GLOBAL DELIVERY SERVICE <span>WORLDWIDE DELIVERY</span>
     </div>
 
     <nav class="nav-links">
@@ -1490,7 +1532,7 @@ footer a{
     </h2>
 
     <p class="section-description">
-      JESTILO Worldwide Delivery provides a customer-facing
+      AIRLINE GLOBAL DELIVERY SERVICE provides a customer-facing
       tracking experience connected to a private shipment
       management system.
     </p>
@@ -1564,7 +1606,7 @@ footer a{
     <div class="gallery-heading">
 
       <div class="section-label">
-        JESTILO WORLDWIDE DELIVERY
+        AIRLINE GLOBAL DELIVERY SERVICE
       </div>
 
       <h2 class="section-title">
@@ -1583,7 +1625,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1494412574643-ff11b0a0f676?auto=format&fit=crop&w=1200&q=90"
           alt="Air freight delivery"
           loading="lazy"
         >
@@ -1599,7 +1641,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=1200&q=90"
           alt="Sea freight delivery"
           loading="lazy"
         >
@@ -1615,7 +1657,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&w=1200&q=90"
           alt="Delivery truck"
           loading="lazy"
         >
@@ -1631,7 +1673,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1586528116493-da8b6f1b6c1c?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=90"
           alt="Warehouse logistics"
           loading="lazy"
         >
@@ -1647,7 +1689,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=90"
           alt="Package logistics"
           loading="lazy"
         >
@@ -1663,7 +1705,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=90"
           alt="Final delivery"
           loading="lazy"
         >
@@ -1679,7 +1721,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d8?auto=format&fit=crop&w=1200&q=90"
           alt="Packages ready for delivery"
           loading="lazy"
         >
@@ -1695,7 +1737,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d8?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1200&q=90"
           alt="Delivery logistics"
           loading="lazy"
         >
@@ -1711,7 +1753,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=1200&q=90"
           alt="Warehouse package handling"
           loading="lazy"
         >
@@ -1727,7 +1769,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=90"
           alt="Shipment transportation"
           loading="lazy"
         >
@@ -1743,7 +1785,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1200&q=90"
           alt="Package sorting"
           loading="lazy"
         >
@@ -1759,7 +1801,7 @@ footer a{
 
       <div class="gallery-card">
         <img
-          src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=90"
+          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=90"
           alt="Global logistics"
           loading="lazy"
         >
@@ -1789,7 +1831,7 @@ footer a{
     <div class="video-heading">
 
       <div class="section-label">
-        JESTILO WORLDWIDE DELIVERY
+        AIRLINE GLOBAL DELIVERY SERVICE
       </div>
 
       <h2 class="section-title">
@@ -1826,7 +1868,7 @@ footer a{
       <div class="video-message">
 
         <strong>
-          📦 JESTILO WORLDWIDE DELIVERY
+          📦 AIRLINE GLOBAL DELIVERY SERVICE
         </strong>
 
         <span>
@@ -1851,7 +1893,7 @@ footer a{
         <div>
 
           <div class="delivery-info-label">
-            JESTILO WORLDWIDE DELIVERY
+            AIRLINE GLOBAL DELIVERY SERVICE
           </div>
 
           <h3>
@@ -1859,7 +1901,7 @@ footer a{
           </h3>
 
           <p>
-            From pickup to final destination, JESTILO
+            From pickup to final destination, AIRLINE GLOBAL DELIVERY SERVICE
             helps keep shipment information organized
             throughout the delivery journey.
           </p>
@@ -2355,7 +2397,7 @@ footer a{
     <div>
 
       <div class="section-label">
-        About JESTILO
+        About AIRLINE GLOBAL DELIVERY SERVICE
       </div>
 
       <h2 class="section-title">
@@ -2363,7 +2405,7 @@ footer a{
       </h2>
 
       <p class="section-description">
-        JESTILO Worldwide Delivery provides a customer-facing
+        AIRLINE GLOBAL DELIVERY SERVICE provides a customer-facing
         tracking experience connected to a private shipment
         management system.
       </p>
@@ -2584,7 +2626,7 @@ footer a{
       <div>
 
         <h3>
-          JESTILO WORLDWIDE DELIVERY
+          AIRLINE GLOBAL DELIVERY SERVICE
         </h3>
 
         <p>
@@ -2630,14 +2672,14 @@ footer a{
           type="button"
           class="tawk-support-button"
           onclick="openCustomerSupport()"
-          aria-label="Open JESTILO Worldwide Delivery customer support"
+          aria-label="Open AIRLINE GLOBAL DELIVERY SERVICE customer support"
         >
           💬 Customer Support
         </button>
 
         <p class="tawk-support-description">
           Need help with your shipment?
-          Chat directly with JESTILO Worldwide Delivery
+          Chat directly with AIRLINE GLOBAL DELIVERY SERVICE
           customer support.
         </p>
 
@@ -2658,7 +2700,7 @@ footer a{
 
 
     <div class="footer-bottom">
-      © 2026 JESTILO Worldwide Delivery.
+      © 2026 AIRLINE GLOBAL DELIVERY SERVICE.
     </div>
 
   </div>
@@ -3062,7 +3104,7 @@ async function showShipmentMap(shipment){
 
   shipmentMarker.bindPopup(
 
-    "<strong>📦 JESTILO Shipment</strong><br><br>" +
+    "<strong>📦 AIRLINE GLOBAL DELIVERY SERVICE Shipment</strong><br><br>" +
 
     "<strong>Current location:</strong><br>" +
 
@@ -3535,7 +3577,7 @@ document
 </script>
 
 
-<!-- JESTILO WORLDWIDE DELIVERY - Tawk.to Customer Support -->
+<!-- AIRLINE GLOBAL DELIVERY SERVICE - Tawk.to Customer Support -->
 <script type="text/javascript">
 var Tawk_API = Tawk_API || {};
 var Tawk_LoadStart = new Date();
@@ -3559,7 +3601,7 @@ function openCustomerSupport(){
   s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!-- End JESTILO Tawk.to Customer Support -->
+<!-- End AIRLINE GLOBAL DELIVERY SERVICE Tawk.to Customer Support -->
 
 </body>
 </html>
